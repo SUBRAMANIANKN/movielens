@@ -50,4 +50,28 @@ edx <- rbind(edx, removed)
 
 rm(dl, ratings, movies, test_index, temp, movielens, removed)
 
-mu_R <- mean(edx$rating)
+edx <- edx %>% mutate(year_release = stringi::stri_extract(title, regex = "(\\d{4})", comments = TRUE ) %>% as.numeric())
+
+edx <- edx %>% mutate(year_eval = year(as_datetime(timestamp)))
+
+
+validation <- validation %>% 
+  mutate(year_release = stringi::stri_extract(title, regex = "(\\d{4})", comments = TRUE ) %>% 
+           as.numeric())
+
+validation <- validation %>% mutate(year_eval = year(as_datetime(timestamp)))
+
+edx <- edx %>% select(-C(timestamp,title))
+ 
+validation  <- validation  %>% select(-c(timestamp, title))
+
+mu_edx_rating <- mean(edx$rating)
+model_baseline <- RMSE(validation$rating, mu_edx_rating)
+
+movieId_avgs_norm <- edx %>% group_by(movieId) %>% summarize(b_m = mean(rating - mu_edx_rating)) 
+
+predicted_movieId_norm <- validation %>% left_join(movieId_avgs_norm, by='movieId') %>% mutate(rating = mu_edx_rating + b_m)
+
+model_movieId_rmse <- RMSE(predicted_movieId_norm$rating , validation$rating) 
+
+
