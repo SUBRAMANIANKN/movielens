@@ -68,10 +68,45 @@ validation  <- validation  %>% select(-c(timestamp, title))
 mu_edx_rating <- mean(edx$rating)
 model_baseline <- RMSE(validation$rating, mu_edx_rating)
 
-movieId_avgs_norm <- edx %>% group_by(movieId) %>% summarize(b_m = mean(rating - mu_edx_rating)) 
 
-predicted_movieId_norm <- validation %>% left_join(movieId_avgs_norm, by='movieId') %>% mutate(rating = mu_edx_rating + b_m)
+
+
+movieId_avgs_norm <- edx %>% group_by(movieId) %>% summarize(b_movieId = mean(rating - mu_edx_rating)) 
+
+predicted_movieId_norm <- validation %>% left_join(movieId_avgs_norm, by='movieId') %>% mutate(rating = mu_edx_rating + b_movieId )
 
 model_movieId_rmse <- RMSE(predicted_movieId_norm$rating , validation$rating) 
 
+movieId_userId_avgs_norm <- edx %>% left_join(movieId_avgs_norm, by='movieId') %>% 
+                                    group_by(userId) %>% 
+                                    summarize(b_movieId_userId = mean(rating - mu_edx_rating - b_movieId)) 
+
+predicted_movieId_userId_norm <- validation %>% left_join(movieId_avgs_norm, by='movieId') %>% 
+     left_join(movieId_userId_avgs_norm, by='userId') %>% mutate(rating = mu_edx_rating + b_movieId +  b_movieId_userId  )
+
+
+model_movieId_userId_rmse <- RMSE(predicted_movieId_userId_norm$rating , validation$rating) 
+
+
+
+
+
+
+
+
+movieGenres_avgs_norm <- edx %>% group_by(genres) %>% summarize(b_movieGenres = mean(rating - mu_edx_rating)) 
+
+predicted_movieGenres_norm <- validation %>% left_join(movieGenres_avgs_norm, by='genres') %>% mutate(rating = mu_edx_rating + b_movieGenres )
+
+model_movieGenres_rmse <- RMSE(predicted_movieGenres_norm$rating , validation$rating) 
+
+movieGenres_userId_avgs_norm <- edx %>% left_join(movieGenres_avgs_norm, by='genres') %>% 
+  group_by(userId) %>% 
+  summarize(b_movieGenres_userId = mean(rating - mu_edx_rating - b_movieGenres)) 
+
+predicted_movieGenres_userId_norm <- validation %>% left_join(movieGenres_avgs_norm, by='genres') %>% 
+  left_join(movieGenres_userId_avgs_norm, by='userId') %>% mutate(rating = mu_edx_rating + b_movieGenres +  b_movieGenres_userId  )
+
+
+model_movieGenres_userId_rmse <- RMSE(predicted_movieGenres_userId_norm$rating , validation$rating) 
 
