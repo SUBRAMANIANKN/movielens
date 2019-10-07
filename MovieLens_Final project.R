@@ -1,4 +1,4 @@
-## Data Loading and Preparation
+## Data Loading and Preparation 
 
 #############################################################
 # Create edx set, validation set, and submission file
