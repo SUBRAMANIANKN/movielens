@@ -1,7 +1,7 @@
 # Movielens
 
 This is the one of the two projects  to be completed as part of the Harvard Data Science Capstone course.  
-The purpose of the  project is to create a movie recommendation system using the MovieLens dataset (10M version of the MovieLens dataset) available in the site Grouplens.org site .  
+The purpose of the  project is to create a movie recommendation system using the MovieLens dataset (10M version of the MovieLens dataset) available in the site Grouplens.org site.  
 
 Below are the 3 deliverables for this project
 
